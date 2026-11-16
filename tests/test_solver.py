@@ -1,5 +1,5 @@
 import unittest
-from csp import solve
+from csp import solve, solution_message
 from search import repair
 
 FULL = [int(c) for c in "534678912672195348198342567859761423426853791713924856961537284287419635345286179"]
@@ -31,7 +31,7 @@ class SolverTests(unittest.TestCase):
         for a,b in [(0,1),(0,9)]:
             grid = FULL.copy()
             grid[a] = grid[b]
-            self.assertFalse(solve(grid)[0],"expected no solution")
+            self.assertEqual(solution_message(solve(grid)[0]), "no solution")
 
     def test_known_correction(self):
         p = [[.001]*9 for _ in FULL]
