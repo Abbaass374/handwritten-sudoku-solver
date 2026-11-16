@@ -1,0 +1,24 @@
+26ff980 Complete field definitions and reproduce report, presentation and log
+9b2694a Use the tested CSP result message in the live demo
+8aeea00 Verify the user-facing message on both impossible puzzles
+283185c Expose a clear message for infeasible Sudoku inputs
+27f5974 Archive complete Git history and per-puzzle correction records
+32e5b49 Persist per-puzzle correction logs for all OCR trials
+386720e Compare neural and non-neural OCR on the same demo input
+ae4975d Add CONTRIBUTIONS.md
+9c8624f Check validity of completions when multiple solutions are possible
+a022102 Generate measured report and presentation with experiment artifacts
+79a1bbe Add reporting.py
+cf409d4 Add DISCUSSION.md
+784e51d Document environment, dataset, evaluation and limits
+d139c29 Add .github/workflows/evaluate.yml
+d6fe40c Add requirements.txt
+03e9056 Add tests/test_solver.py
+972d0b6 Add eval.py
+4d65e3d Add run_demo.py
+2456107 Add integration.py
+bdf654a Add nn.py
+fd774c7 Add make_data.py
+b645442 Add search.py
+52c413e Add csp.py
+bc2a729 Initial commit
