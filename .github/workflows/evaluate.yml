@@ -32,9 +32,13 @@ jobs:
             outputs/metrics.json
             outputs/demo.*
       - run: python eval.py
+      - run: python -c 'from reporting import render; render()'
+      - run: git log --oneline > outputs/git-log.txt
       - uses: actions/upload-artifact@v4
         with:
           name: experiments
           path: |
             outputs/*.csv
             outputs/*.png
+            outputs/*.pdf
+            outputs/git-log.txt
