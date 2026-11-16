@@ -74,3 +74,8 @@ def solve(grid, fc=True, ac=True, limit=1, rng=None):
             counts.backtracks += int(before == len(solutions))
     visit(domains)
     return solutions, counts
+
+
+def solution_message(solutions):
+    """Format the direct CSP result for display."""
+    return solutions[0] if solutions else "no solution"
