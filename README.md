@@ -1,1 +1,41 @@
-# handwritten-sudoku-solver
+# Handwritten Sudoku Reader and Solver
+
+Python 3.11. From the repository root run:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python make_data.py
+OPENBLAS_NUM_THREADS=2 python nn.py
+python run_demo.py --errors 1
+python eval.py
+git log --oneline
+```
+
+On Windows activate with `.venv\Scripts\activate`. GitHub Actions also defines the full sequence. Outputs are written to `outputs/`. Download model-and-demo and experiments from a successful workflow run. For the local demo generate the dataset and predictions first.
+
+## Data dictionary
+
+| Field | Origin | Meaning |
+|---|---|---|
+| x | MNIST | 784 uint8 pixel intensities, flattened row-major from a centered 28×28 grayscale image. Divide by 255 at model input. |
+| y | MNIST | Digit label. Discard zero after splitting. |
+| train / val / test | Official MNIST plus seeded split | Split 60,000 official training examples 50k/10k before filtering. Keep official test partition separate. |
+| clues / truth | Generated | 81 cells in row-major order. Zero means blank. Randomized backtracking builds a full solution. Remove a clue only if counting up to two solutions confirms uniqueness. |
+| mosaic | Generated | 252×252 pixels, composed of labeled test digits and black blank cells. No camera or perspective correction. |
+| probabilities | Learned | Nine temperature-scaled digit probabilities per image, calibrated on validation data. |
+| level | Experiment setting | Number of injected misreads in OCR trials, number of givens in CSP trials. |
+| seed / puzzle | Generated | Replicate and within-replicate index. Paired across methods. |
+| recovery | Measured | 1 only when all 81 output cells equal ground truth. |
+| expanded / generated | Measured | Search states popped / unique states inserted, including root. |
+| assignments / backtracks / pruned | Measured | CSP assignments tried, fruitless assigned branches, and domain values deleted. |
+
+## Evaluating the system
+
+The unconditioned test-set accuracy, confusion matrices and equal-count-bin calibration errors are in metrics.json. Puzzle trials deliberately control difficulty. Clean clues use correctly classified test images; injected errors use actual incorrect predictions whose top three include the real label. This evaluates recovery under a controlled error model. It does not estimate the natural frequency of misreads. Individual images can recur across generated puzzles.
+
+Search pays log(p(original)/p(replacement)) for a change. With a duplicate, at least one endpoint must change. A* uses the cheapest eligible endpoint correction for one conflict as a lower bound. UCS and A* optimize within the top-three alternatives and three-edit cap. A solvable board can differ from the intended answer. Four-error trials probe this limit. FC removes the assigned value from neighbors; AC-3 propagates singleton domains before branching. All variants use minimum remaining values.
+
+See DISCUSSION.md for the talk and live demo. Use actual team roles for the contribution statement and attach the real git log.
