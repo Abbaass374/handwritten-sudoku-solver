@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from integration import ReaderExperiment
 from make_data import puzzle, ROOT
-from csp import solve
+from csp import solve, solution_message
 from search import repair
 
 
@@ -23,7 +23,7 @@ def demo(seed, errors):
     clues, truth = puzzle(seed,30)
     grid, p, mosaic = ReaderExperiment().sample(clues,seed,errors)
     print("Raw OCR", np.reshape(grid,(9,9)))
-    print("Without learned correction",solve(grid)[0][:1] or "no solution")
+    print("Without learned correction",solution_message(solve(grid)[0]))
     solution, edits, trace, generated = repair(grid,p)
     off_grid, off_weights = template_read(mosaic)
     off_solution, off_edits, off_trace, off_generated = repair(off_grid, off_weights)
