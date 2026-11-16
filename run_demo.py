@@ -7,12 +7,30 @@ from csp import solve
 from search import repair
 
 
+def template_read(mosaic):
+    """Classify the same pixels with training-set digit means; no neural predictions."""
+    with np.load(ROOT/"train.npz") as train:
+        x, y = train["x"], train["y"]
+    centers = np.stack([x[y == d].mean(axis=0) for d in range(1, 10)]) / 255
+    cells = mosaic.reshape(9, 28, 9, 28).transpose(0, 2, 1, 3).reshape(81, 784)
+    distances = ((cells[:, None, :] / 255 - centers) ** 2).sum(axis=2)
+    scores = np.exp(-(distances - distances.min(axis=1, keepdims=True)))
+    weights = scores / scores.sum(axis=1, keepdims=True)
+    return np.where(cells.max(axis=1) > 25, weights.argmax(axis=1) + 1, 0).tolist(), weights
+
+
 def demo(seed, errors):
     clues, truth = puzzle(seed,30)
     grid, p, mosaic = ReaderExperiment().sample(clues,seed,errors)
     print("Raw OCR", np.reshape(grid,(9,9)))
     print("Without learned correction",solve(grid)[0][:1] or "no solution")
     solution, edits, trace, generated = repair(grid,p)
+    off_grid, off_weights = template_read(mosaic)
+    off_solution, off_edits, off_trace, off_generated = repair(off_grid, off_weights)
+    print("NN off (template OCR, same mosaic):", "solved" if off_solution else "no solution",
+          "exact recovery", off_solution == truth, "expanded", len(off_trace),
+          "generated", off_generated, "corrections", off_edits)
+    print("NN on (MLP OCR): exact recovery", solution == truth)
     print("Search trace",trace[:30],"expanded",len(trace),"generated",generated)
     print("Corrections (zero-based cell, old, new, cost)",edits)
     if solution is None:
