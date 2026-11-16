@@ -10,7 +10,13 @@ class SolverTests(unittest.TestCase):
         for stride in (3,4,5,6,7):
             with self.subTest(stride=stride):
                 grid = [0 if i%stride==0 else d for i,d in enumerate(FULL)]
-                self.assertIn(FULL, solve(grid,limit=2)[0])
+                answer = solve(grid)[0][0]
+                self.assertTrue(all(not clue or clue == answer[i] for i,clue in enumerate(grid)))
+                self.assertTrue(all(set(answer[i:i+9]) == set(range(1,10)) for i in range(0,81,9)))
+                self.assertTrue(all(len(set(answer[i::9])) == 9 for i in range(9)))
+                for row in (0,3,6):
+                    for col in (0,3,6):
+                        self.assertEqual(len({answer[9*(row+r)+col+c] for r in range(3) for c in range(3)}),9)
 
     def test_full(self):
         self.assertEqual(solve(FULL)[0],[FULL])
