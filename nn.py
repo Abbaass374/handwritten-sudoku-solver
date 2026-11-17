@@ -1,3 +1,4 @@
+import argparse
 import json
 import joblib
 import numpy as np
@@ -13,11 +14,11 @@ def calibrated(p, temperature):
     return softmax(np.log(np.clip(p,1e-12,1))/temperature, axis=1)
 
 
-def train():
+def train(seed=374):
     train, val, test = [np.load(ROOT/(key+".npz")) for key in ("train","val","test")]
     results = {}
     for name, model in [("logistic",LogisticRegression(max_iter=250)),
-                        ("mlp",MLPClassifier((96,),max_iter=24,random_state=374,early_stopping=True))]:
+                        ("mlp",MLPClassifier((96,),max_iter=24,random_state=seed,early_stopping=True))]:
         model.fit(train["x"].astype("float32")/255,train["y"])
         pv = model.predict_proba(val["x"].astype("float32")/255)
         temp = minimize_scalar(lambda t: log_loss(val["y"],calibrated(pv,t)),
@@ -38,4 +39,6 @@ def train():
 
 
 if __name__ == "__main__":
-    train()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type=int, default=374, help="MLP training seed")
+    train(parser.parse_args().seed)
