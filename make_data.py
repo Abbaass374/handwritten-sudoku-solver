@@ -1,4 +1,5 @@
 """Download canonical MNIST IDX shards and generate unique Sudoku puzzles."""
+import argparse
 import gzip
 import hashlib
 import random
@@ -48,4 +49,6 @@ def puzzle(seed, givens):
 
 
 if __name__ == "__main__":
-    prepare()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type=int, default=374, help="Train/validation split seed")
+    prepare(parser.parse_args().seed)
